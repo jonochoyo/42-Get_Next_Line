@@ -6,29 +6,34 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/15 17:34:22 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/16 17:02:20 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 /*
-Static variables have the property of preserving their value even after 
-they are out of their scope. 
+Attempting to read BUFFER_SIZE from a text file. 
+If the fd is negative or the BUFFER_SIZE is <= 0, return NULL as can't read. 
 */
 
 char	*get_next_line(int fd)
 {
 	char	*buffer;
 
-	buffer = malloc(sizeof(char) * 25);
-	fd = open("test.txt", O_RDONLY);
-	read(fd, buffer, 25);
-
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (buffer == NULL)
+		return (NULL);
+	read(fd, buffer, BUFFER_SIZE);
 	return (buffer);
 }
 
 int	main(void)
 {
-	printf("%s", get_next_line(1));
+	int	fd;
+
+	fd = open("test.txt", O_RDONLY);
+	printf("%s", get_next_line(fd));
 }
