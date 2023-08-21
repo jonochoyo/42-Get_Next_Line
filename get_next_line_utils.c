@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:33:51 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/18 16:16:51 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/21 17:12:25 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,66 +31,48 @@ char	*ft_strchr(const char *s, int c)
 char	*ft_strdup(const char *s1)
 {
 	char	*ptr;
-	int		nbytes;
+	int		i;
+	int		len;
 
-	nbytes = ft_strlen(s1) + 1;
-	ptr = (char *) malloc(sizeof(char) * nbytes);
+	i = 0;
+	len = ft_strlen(s1);
+	ptr = (char *) malloc(sizeof(char) * (len + 1));
 	if (ptr == NULL)
 		return (NULL);
-	ft_strlcpy(ptr, s1, nbytes);
+	while (i < len)
+	{
+		ptr[i] = s1[i];
+		i++;
+	}
+	ptr[i] = '\0';
 	return (ptr);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*dest;
+	int		i;
+	int		j;
 	size_t	nbytes;
 
-	if (s1 == NULL || s2 == NULL)
-		return (NULL);
+	i = 0;
+	j = 0;
 	nbytes = ft_strlen(s1) + ft_strlen(s2) + 1;
 	dest = (char *) malloc(sizeof(char) * nbytes);
 	if (dest == NULL)
 		return (NULL);
-	ft_strlcpy(dest, s1, ft_strlen(s1) + 1);
-	ft_strlcat(dest, s2, nbytes);
-	return (dest);
-}
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	size_t	i;
-
-	i = 0;
-	if (dstsize > 0)
+	while (s1[i] != '\0')
 	{
-		while (src[i] != '\0' && i < dstsize - 1)
-		{
-			dst[i] = src[i];
-			i++;
-		}
-		dst[i] = '\0';
-	}
-	return (ft_strlen(src));
-}
-
-size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
-{
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	j = 0;
-	while (dst[i] != '\0' && (i < dstsize))
+		dest[i] = s1[i];
 		i++;
-	while ((i + j + 1) < dstsize && src[j] != '\0')
+	}
+	while (s2[j] != '\0')
 	{
-		dst[i + j] = src[j];
+		dest[i + j] = s2[j];
 		j++;
 	}
-	if (i < dstsize)
-		dst[i + j] = '\0';
-	return (i + ft_strlen(src));
+	dest[i + j] = '\0';
+	return (dest);
 }
 
 size_t	ft_strlen(const char *s)

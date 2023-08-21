@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/18 17:55:08 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/21 18:12:53 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,35 +24,31 @@ and saving the bytes into the buffer as many times as needed. it stops once
 get a full line.
 */
 
-char	*save_full_line(int fd)
+static char	*save_full_line(int fd, char *buffer)
 {
 	char	*full_line;
 	int		bytes_read;
 	int		line_completed;
-	char	*buffer;
+	char	*temp;
 
 	line_completed = 0;
-	full_line = ft_strdup("\0");
+	full_line = NULL;
 	while (line_completed == 0)
 	{
-		buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (buffer == NULL)
-		{
-			free(full_line);
-			return (NULL);
-		}	
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read <= 0)
-		{
-			free(buffer);
-			free(full_line);
+		if (bytes_read < 0)
 			return (NULL);
-		}
-		buffer[BUFFER_SIZE] = '\0';
+		if (bytes_read == 0)
+			break ;
+		buffer[bytes_read] = '\0';
+		if (full_line == NULL)
+			full_line = ft_strdup("");
+		temp = full_line;
+		full_line = ft_strjoin(temp, buffer);
+		free(temp);
+		temp = NULL;
 		if (ft_strchr(buffer, '\n') != 0)
 			line_completed = 1;
-		full_line = ft_strjoin(full_line, buffer);
-		free(buffer);
 	}
 	return (full_line);
 }
@@ -62,7 +58,7 @@ Pass the full line to the helper function and get a substring from it up
 to and including the \n.
 */
 
-char	*get_cropped_line(char	*full_line)
+static char	*get_cropped_line(char	*full_line)
 {
 	size_t	i;
 	char	*cropped_line;
@@ -71,15 +67,13 @@ char	*get_cropped_line(char	*full_line)
 	if (full_line == NULL)
 		return (NULL);
 	while (full_line[i] != '\n' && full_line[i] != '\0')
-	{
 		i++;
-	}
 	i++;
 	cropped_line = ft_substr(full_line, 0, i);
 	return (cropped_line);
 }
 
-char	*get_line_remainder(char *full_line)
+static char	*get_line_remainder(char *full_line)
 {
 	size_t	i;
 	int		start;
@@ -87,16 +81,16 @@ char	*get_line_remainder(char *full_line)
 	char	*line_remainder;
 
 	i = 0;
+	line_remainder = NULL;
 	if (full_line == NULL)
 		return (NULL);
 	while (full_line[i] != '\n' && full_line[i] != '\0')
-	{
 		i++;
-	}
 	i++;
 	start = i;
-	remain_len = ft_strlen(full_line) - start + 1;
-	line_remainder = ft_substr(full_line, start, remain_len);
+	remain_len = ft_strlen(full_line) - start;
+	if (remain_len > 0)
+		line_remainder = ft_substr(full_line, start, remain_len);
 	if (line_remainder == NULL)
 		return (NULL);
 	return (line_remainder);
@@ -104,14 +98,19 @@ char	*get_line_remainder(char *full_line)
 
 char	*get_next_line(int fd)
 {
-	char	*full_line;
-	char	*cropped_line;
+	char		*full_line;
+	char		*cropped_line;
 	static char	*remaining_line;
-	char	*return_line;
+	char		*return_line;
+	char		*buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	full_line = save_full_line(fd);
+	buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (buffer == NULL)
+		return (NULL);
+	full_line = save_full_line(fd, buffer);
+	free(buffer);
 	if (full_line == NULL)
 		return (NULL);
 	cropped_line = get_cropped_line(full_line);
