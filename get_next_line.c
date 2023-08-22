@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/21 18:12:53 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/22 15:20:18 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,13 @@ and saving the bytes into the buffer as many times as needed. it stops once
 get a full line.
 */
 
-static char	*save_full_line(int fd, char *buffer)
+static char	*save_full_line(int fd, char *buffer, char *remaining_line)
 {
-	char	*full_line;
 	int		bytes_read;
 	int		line_completed;
 	char	*temp;
 
 	line_completed = 0;
-	full_line = NULL;
 	while (line_completed == 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
@@ -41,16 +39,16 @@ static char	*save_full_line(int fd, char *buffer)
 		if (bytes_read == 0)
 			break ;
 		buffer[bytes_read] = '\0';
-		if (full_line == NULL)
-			full_line = ft_strdup("");
-		temp = full_line;
-		full_line = ft_strjoin(temp, buffer);
+		if (remaining_line == NULL)
+			remaining_line = ft_strdup("");
+		temp = remaining_line;
+		remaining_line = ft_strjoin(temp, buffer);
 		free(temp);
 		temp = NULL;
 		if (ft_strchr(buffer, '\n') != 0)
 			line_completed = 1;
 	}
-	return (full_line);
+	return (remaining_line);
 }
 
 /*
@@ -100,28 +98,29 @@ char	*get_next_line(int fd)
 {
 	char		*full_line;
 	char		*cropped_line;
-	static char	*remaining_line;
-	char		*return_line;
 	char		*buffer;
+	static char	*remaining_line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (buffer == NULL)
 		return (NULL);
-	full_line = save_full_line(fd, buffer);
+	full_line = save_full_line(fd, buffer, remaining_line);
 	free(buffer);
 	if (full_line == NULL)
+	{
+		if (remaining_line != NULL)
+		{
+			free(remaining_line);
+			remaining_line = NULL;
+		}
 		return (NULL);
+	}
 	cropped_line = get_cropped_line(full_line);
-	if (remaining_line != NULL)
-		return_line = ft_strjoin(remaining_line, cropped_line);
-	else
-		return_line = ft_strdup(cropped_line);
 	remaining_line = get_line_remainder(full_line);
 	free(full_line);
-	free(cropped_line);
-	return (return_line);
+	return (cropped_line);
 }
 
 /*
