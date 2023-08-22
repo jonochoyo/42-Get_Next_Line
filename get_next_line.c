@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/22 16:16:14 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:34:28 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,15 @@
 /*
 Attempting to read BUFFER_SIZE from a text file. 
 If the fd is negative or the BUFFER_SIZE is <= 0, return NULL as can't read. 
-If the return value of read is <= 0 mean we reached the EOF or we got an error.
+If the return value of read is < 0 mean we have an error.
+If the return value of read is = 0 we reached the EOF.
 */
 
 /*
 save_full_line will get a full line including '\n' by reading the file
 and saving the bytes into the buffer as many times as needed. it stops once
-get a full line.
+get a full line. It also gets the remaining from the static variable to make 
+the full line.
 */
 
 static char	*save_full_line(int fd, char *buffer, char *remaining_line)
@@ -71,6 +73,10 @@ static char	*get_cropped_line(char	*full_line)
 	return (cropped_line);
 }
 
+/*
+Gets the full line and returns the remainder of the line after the \n
+*/
+
 static char	*get_line_remainder(char *full_line)
 {
 	size_t	i;
@@ -93,6 +99,12 @@ static char	*get_line_remainder(char *full_line)
 		return (NULL);
 	return (line_remainder);
 }
+
+/*
+Creates the buffer and calls the function to get the full line, 
+crop the line and save the remainder to then use again on the next
+read.
+*/
 
 char	*get_next_line(int fd)
 {
