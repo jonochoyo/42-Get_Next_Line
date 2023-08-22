@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:12:10 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/22 12:42:54 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:03:30 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 # include <stdlib.h>
 
 // testing
-# include <fcntl.h>
-# include <stdio.h>
+// # include <fcntl.h>
+// # include <stdio.h>
 
 // Define BUFFER_SIZE if it is not given on compilation
 // Defininng as 100000 for testing reading a big amount of bytes.
