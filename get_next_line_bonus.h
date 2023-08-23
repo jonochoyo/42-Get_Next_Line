@@ -1,22 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:12:10 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/23 14:24:47 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/23 13:42:49 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # include <unistd.h>
 # include <stdlib.h>
 
-// Define a big BUFFER_SIZE if it is not given on compilation
+// testing
+// # include <fcntl.h>
+// # include <stdio.h>
+
+// Define BUFFER_SIZE if it is not given on compilation
+// Defininng as 100000 for testing reading a big amount of bytes.
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 100000
 # endif
