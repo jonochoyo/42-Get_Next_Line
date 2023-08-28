@@ -6,31 +6,17 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/23 13:58:53 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/28 17:52:04 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
-/*
-Attempting to read BUFFER_SIZE from a text file. 
-If the fd is negative or the BUFFER_SIZE is <= 0, return NULL as can't read. 
-If the return value of read is < 0 mean we have an error.
-If the return value of read is = 0 we reached the EOF.
-*/
-
-/*
-prep_rough_line will get a full line including '\n' by reading the file
-and saving the bytes into the buffer as many times as needed. it stops once
-get a full line. It also gets the remaining from the static variable to make 
-the full line.
-*/
-
-static char	*prep_rough_line(int fd, char *buffer, char *remaining_line)
+static char	*get_rough_line(int fd, char *buffer, char *line_save)
 {
+	char	*temp;
 	int		bytes_read;
 	int		line_completed;
-	char	*temp;
 
 	line_completed = 0;
 	while (line_completed == 0)
@@ -40,100 +26,89 @@ static char	*prep_rough_line(int fd, char *buffer, char *remaining_line)
 			return (NULL);
 		if (bytes_read == 0)
 			break ;
-		buffer[bytes_read] = '\0';
-		if (remaining_line == NULL)
-			remaining_line = ft_strdup("");
-		temp = remaining_line;
-		remaining_line = ft_strjoin(temp, buffer);
+		buffer[bytes_read] = '\0'; 
+		if (line_save == NULL)
+			line_save = ft_strdup("");
+		temp = line_save;
+		line_save = ft_strjoin(temp, buffer);
 		free(temp);
 		temp = NULL;
 		if (ft_strchr(buffer, '\n') != 0)
 			line_completed = 1;
 	}
-	return (remaining_line);
+	return (line_save);
 }
 
-/*
-Pass the full line to the helper function and get a substring from it up 
-to and including the \n.
-*/
-
-static char	*get_cropped_line(char	*full_line)
+static char	*get_cropped_line(char *rough_line)
 {
 	size_t	i;
 	char	*cropped_line;
 
 	i = 0;
-	if (full_line == NULL)
+	if (rough_line == NULL)
 		return (NULL);
-	while (full_line[i] != '\n' && full_line[i] != '\0')
+	while (rough_line[i] != '\n' && rough_line[i] != '\0')
 		i++;
-	i++;
-	cropped_line = ft_substr(full_line, 0, i);
+	cropped_line = ft_substr(rough_line, 0, i + 1);
 	return (cropped_line);
 }
 
-/*
-Gets the full line and returns the remainder of the line after the \n
-*/
-
-static char	*get_line_remainder(char *full_line)
+static char	*get_line_remainder(char *rough_line)
 {
-	size_t	i;
+	char	*line_remainder;
 	int		start;
 	int		remain_len;
-	char	*line_remainder;
+	size_t	i;
 
 	i = 0;
 	line_remainder = NULL;
-	if (full_line == NULL)
+	if (rough_line == NULL)
 		return (NULL);
-	while (full_line[i] != '\n' && full_line[i] != '\0')
+	while (rough_line[i] != '\n' && rough_line[i] != '\0')
 		i++;
-	i++;
-	start = i;
-	remain_len = ft_strlen(full_line) - start;
+	start = i + 1;
+	remain_len = ft_strlen(rough_line) - start;
 	if (remain_len > 0)
-		line_remainder = ft_substr(full_line, start, remain_len);
+		line_remainder = ft_substr(rough_line, start, remain_len);
 	if (line_remainder == NULL)
 		return (NULL);
 	return (line_remainder);
 }
 
 /*
-Creates the buffer and calls the function to get the full line, 
-crop the line and save the remainder to then use again on the next
-read.
-To use several fd, we create an array of strings static variable to save
-each remaining line for each fd on its corresponding index. 
+Bonus
+- Use an array of strings as static variable to carry the line_remainder
+for each fd. 
+- Edit the function to use line_remainder[fd] to get next line of each fd and
+edit the static variable string that corresponds to each fd.
 */
 
 char	*get_next_line(int fd)
 {
-	char		*full_line;
-	char		*cropped_line;
 	char		*buffer;
-	static char	*remaining_line[1024];
+	char		*rough_line;
+	char		*cropped_line;
+	static char	*line_remainder[1024];
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || fd > 1023)
 		return (NULL);
 	buffer = (char *) malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (buffer == NULL)
 		return (NULL);
-	full_line = prep_rough_line(fd, buffer, remaining_line[fd]);
+	rough_line = get_rough_line(fd, buffer, line_remainder[fd]);
 	free(buffer);
-	if (full_line == NULL)
+	if (rough_line == NULL)
 	{
-		if (remaining_line[fd] != NULL)
+		if (line_remainder[fd] != NULL)
 		{
-			free(remaining_line[fd]);
-			remaining_line[fd] = NULL;
+			free(line_remainder[fd]);
+			line_remainder[fd] = NULL;
 		}
 		return (NULL);
 	}
-	cropped_line = get_cropped_line(full_line);
-	remaining_line[fd] = get_line_remainder(full_line);
-	free(full_line);
+	line_remainder[fd] = get_line_remainder(rough_line);
+	cropped_line = get_cropped_line(rough_line);
+	free(rough_line);
 	return (cropped_line);
 }
 
@@ -141,20 +116,25 @@ char	*get_next_line(int fd)
 Test with main to keep reading until it reaches the end of file.
 */
 
-// int	main(void)
-// {
-// 	char	*line;
-// 	int		fd;
+/*
+#include <fcntl.h>
+#include <stdio.h>
 
-// 	fd = open("test.txt", O_RDONLY);
-// 	line = get_next_line(fd);
-// 	printf("--");
-// 	while (line != NULL)
-// 	{
-// 		printf("%s--", line);
-// 		free(line);
-// 		line = get_next_line(fd);
-// 	}
-// 	close(fd);
-// 	return (0);
-// }
+int	main(void)
+{
+	char	*line;
+	int		fd;
+
+	fd = open("test.txt", O_RDONLY);
+	line = get_next_line(fd);
+	printf("--");
+	while (line != NULL)
+	{
+		printf("%s--", line);
+		free(line);
+		line = get_next_line(fd);
+	}
+	close(fd);
+	return (0);
+}
+*/

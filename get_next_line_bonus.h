@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 16:12:10 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/23 13:42:49 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/28 16:37:31 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-// testing
-// # include <fcntl.h>
-// # include <stdio.h>
-
-// Define BUFFER_SIZE if it is not given on compilation
-// Defininng as 100000 for testing reading a big amount of bytes.
+// Define a big BUFFER_SIZE if it is not given on compilation
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 100000
 # endif
@@ -31,7 +26,7 @@ char	*get_next_line(int fd);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s1);
 char	*ft_strjoin(char const *s1, char const *s2);
-size_t	ft_strlen(const char *s);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
+size_t	ft_strlen(const char *s);
 
 #endif 
