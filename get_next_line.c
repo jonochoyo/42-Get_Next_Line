@@ -6,15 +6,16 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/23 17:00:44 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/28 13:22:43 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 /*
-Attempting to read BUFFER_SIZE from a text file. 
-If the fd is negative or the BUFFER_SIZE is <= 0, return NULL as can't read. 
+A rough line is the result of 1 or more buffer reads that reaches a new line 
+or EOF. This can include characters after the '\n' or not include a '\n' if
+it is the EOF.
 If the return value of read is < 0 mean we have an error.
 If the return value of read is = 0 we reached the EOF.
 */
@@ -68,13 +69,12 @@ static char	*get_cropped_line(char	*rough_line)
 		return (NULL);
 	while (rough_line[i] != '\n' && rough_line[i] != '\0')
 		i++;
-	i++;
-	cropped_line = ft_substr(rough_line, 0, i);
+	cropped_line = ft_substr(rough_line, 0, i + 1);
 	return (cropped_line);
 }
 
 /*
-Gets the rough line and returns the remainder of the line after the \n
+Gets the rough line and returns the remainder of the line after the '\n'
 */
 
 static char	*get_line_remainder(char *rough_line)
@@ -90,8 +90,7 @@ static char	*get_line_remainder(char *rough_line)
 		return (NULL);
 	while (rough_line[i] != '\n' && rough_line[i] != '\0')
 		i++;
-	i++;
-	start = i;
+	start = i + 1;
 	remain_len = ft_strlen(rough_line) - start;
 	if (remain_len > 0)
 		line_remainder = ft_substr(rough_line, start, remain_len);
@@ -101,9 +100,8 @@ static char	*get_line_remainder(char *rough_line)
 }
 
 /*
-Creates the buffer and calls the function to get the rough line, 
-crop the line and save the remainder to then use again on the next
-read.
+Allocates the read buffer memory and calls the function to get the rough line, 
+crop the line and save the remainder to use it on the next read.
 */
 
 char	*get_next_line(int fd)
