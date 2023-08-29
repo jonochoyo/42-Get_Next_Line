@@ -6,7 +6,7 @@
 /*   By: jchoy-me <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 15:34:08 by jchoy-me          #+#    #+#             */
-/*   Updated: 2023/08/28 17:52:04 by jchoy-me         ###   ########.fr       */
+/*   Updated: 2023/08/29 14:39:45 by jchoy-me         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ static char	*get_line_remainder(char *rough_line)
 /*
 Bonus
 - Use an array of strings as static variable to carry the line_remainder
-for each fd. 
+string for each fd. 
 - Edit the function to use line_remainder[fd] to get next line of each fd and
 edit the static variable string that corresponds to each fd.
 */
